@@ -117,7 +117,13 @@ col3.metric("Balance", f"${balance:.2f}")
 # -------- CHARTS (FAST) --------
 st.subheader("📊 Expense by Category")
 
-expenses = filtered_df[filtered_df["type"] == "Expense"]
+# Create a separate DataFrame for chart that only filters by month
+chart_df = df.copy()
+
+if month_filter != "All":
+    chart_df = chart_df[chart_df["month"] == month_filter]
+
+expenses = chart_df[filtered_df["type"] == "Expense"]
 
 if not expenses.empty:
     cat_sum = expenses.groupby("category")["amount"].sum()
