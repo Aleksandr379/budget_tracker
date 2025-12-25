@@ -25,6 +25,7 @@ CATEGORIES = [
     "Subscriptions",
     "Travel",
     "Gifts",
+    "Salary",
     "Savings",
     "Other"
 ]
@@ -42,7 +43,12 @@ def save_data(df):
 df = load_data()
 
 if not df.empty:
-    df["date"] = pd.to_datetime(df["date"])
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    df = df.dropna(subset=["date"])
+
+    if not pd.api.types.is_datetime64_any_dtype(df["date"]):
+        st.error("Date column is not in datetime format.")
+        st.stop()
 
 # ---------------- UI ----------------
 st.title("Budget Tracker")
@@ -60,7 +66,7 @@ with st.form("transaction_form", clear_on_submit=True):
 
     if submit:
         new_row = pd.DataFrame([{
-            "date": trans_date,
+            "date": pd.to_datetime(trans_date),
             "type": trans_type,
             "category": category,
             "amount": amount,
